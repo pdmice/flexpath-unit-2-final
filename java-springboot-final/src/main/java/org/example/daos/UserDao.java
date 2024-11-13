@@ -2,6 +2,7 @@ package org.example.daos;
 
 import org.example.exceptions.DaoException;
 import org.example.models.User;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -68,9 +69,9 @@ public class UserDao {
      */
     public User createUser(User user) {
         String hashedPassword = passwordEncoder.encode(user.getPassword());
-        String sql = "INSERT INTO users (username, password, first_name, last_name, email) VALUES (?,?,?,?,?);";
+        String sql = "INSERT INTO users (username, password) VALUES (?,?);";
         try {
-            jdbcTemplate.queryForObject(sql, String.class, user.getUsername(), hashedPassword);
+            jdbcTemplate.update(sql, user.getUsername(), hashedPassword);
             return getUserByUsername(user.getUsername());
         } catch (EmptyResultDataAccessException e) {
             throw new DaoException("Failed to create user.");
@@ -122,8 +123,11 @@ public class UserDao {
      * @return List of String
      */
     public List<String> addRole(String username, String role) {
-        String sql = "INSERT INTO roles (username, role) VALUES (?,?)";
-        jdbcTemplate.update(sql, username, role);
+        try {
+            String sql = "INSERT INTO roles (username, role) VALUES (?,?)";
+            jdbcTemplate.update(sql, username, role);
+        } catch (DataAccessException e) {
+        }
         return getRoles(username);
     }
 

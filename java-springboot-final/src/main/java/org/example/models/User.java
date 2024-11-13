@@ -1,7 +1,5 @@
 package org.example.models;
 
-import java.util.Map;
-
 /**
  * Model class for users.
  */

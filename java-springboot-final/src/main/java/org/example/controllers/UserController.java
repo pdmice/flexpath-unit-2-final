@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
 /**
@@ -16,6 +15,7 @@ import java.util.List;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/users")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class UserController {
     /**
      * The user data access object.
@@ -36,22 +36,9 @@ public class UserController {
      *
      * @return A list of all users.
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public List<User> getAll() {
         return userDao.getUsers();
-    }
-
-    /**
-     * Gets a user by their username.
-     *
-     * @param username The username of the user.
-     * @return The user with the given username.
-     */
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping(path = "/{username}")
-    public User get(@PathVariable String username) {
-        return userDao.getUserByUsername(username);
     }
 
     /**
@@ -61,9 +48,32 @@ public class UserController {
      * @return The created user.
      */
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(path = "/users")
+    @PostMapping
+    @PreAuthorize("permitAll()")
     public User create(@RequestBody User user) {
         return userDao.createUser(user);
+    }
+
+    /**
+     * Gets a user by their username.
+     *
+     * @param username The username of the user.
+     * @return The user with the given username.
+     */
+    @GetMapping(path = "/{username}")
+    public User get(@PathVariable String username) {
+        return userDao.getUserByUsername(username);
+    }
+
+    /**
+     * Deletes a user.
+     *
+     * @param username The username of the user to delete.
+     */
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping(path = "/{username}")
+    public void delete(@PathVariable String username) {
+        userDao.deleteUser(username);
     }
 
     /**
@@ -73,8 +83,7 @@ public class UserController {
      * @param username The username of the user.
      * @return The updated user.
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PutMapping(path = "users/{username}/password")
+    @PutMapping(path = "/{username}/password")
     public User updatePassword(@RequestBody String password, @PathVariable String username) {
         User user = userDao.getUserByUsername(username);
         user.setPassword(password);
@@ -82,26 +91,13 @@ public class UserController {
     }
 
     /**
-     * Deletes a user.
-     *
-     * @param username The username of the user to delete.
-     */
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(path = "users/{username}")
-    public void delete(@PathVariable String username) {
-        userDao.deleteUser(username);
-    }
-
-    /**
      * Gets all roles for a user.
      *
      * @return A list of all roles for the user.
      */
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping(path = "/roles")
-    public List<String> getRoles(Principal principal) {
-        return userDao.getRoles(principal.getName());
+    @GetMapping(path = "/{username}/roles")
+    public List<String> getRoles(@PathVariable String username) {
+        return userDao.getRoles(username);
     }
 
     /**
@@ -111,8 +107,7 @@ public class UserController {
      * @param role The role to add.
      * @return A list of all roles for the user.
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping(path = "users/{username}/roles")
+    @PostMapping(path = "/{username}/roles")
     public List<String> addRole(@PathVariable String username, @RequestBody String role) {
         return userDao.addRole(username, role.toUpperCase());
     }
@@ -123,9 +118,8 @@ public class UserController {
      * @param username The username of the user.
      * @param role The role to delete.
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(path = "users/{username}/roles/{role}")
+    @DeleteMapping(path = "/{username}/roles/{role}")
     public void deleteRole(@PathVariable String username, @PathVariable String role) {
         userDao.deleteRole(username, role.toUpperCase());
     }
