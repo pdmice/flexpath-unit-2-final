@@ -42,19 +42,6 @@ public class UserController {
     }
 
     /**
-     * Creates a new user.
-     *
-     * @param user The user to create.
-     * @return The created user.
-     */
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping
-    @PreAuthorize("permitAll()")
-    public User create(@RequestBody User user) {
-        return userDao.createUser(user);
-    }
-
-    /**
      * Gets a user by their username.
      *
      * @param username The username of the user.
@@ -66,14 +53,16 @@ public class UserController {
     }
 
     /**
-     * Deletes a user.
+     * Creates a new user.
      *
-     * @param username The username of the user to delete.
+     * @param user The user to create.
+     * @return The created user.
      */
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(path = "/{username}")
-    public void delete(@PathVariable String username) {
-        userDao.deleteUser(username);
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping
+    @PreAuthorize("permitAll()")
+    public User create(@RequestBody User user) {
+        return userDao.createUser(user);
     }
 
     /**
@@ -88,6 +77,17 @@ public class UserController {
         User user = userDao.getUserByUsername(username);
         user.setPassword(password);
         return userDao.updatePassword(user);
+    }
+
+    /**
+     * Deletes a user.
+     *
+     * @param username The username of the user to delete.
+     */
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping(path = "/{username}")
+    public void delete(@PathVariable String username) {
+        userDao.deleteUser(username);
     }
 
     /**
