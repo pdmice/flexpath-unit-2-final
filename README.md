@@ -24,8 +24,7 @@ database are not yet implemented.
 The application source contains the following directories:
 
 - `src/main/java/org.example/models` - Contains the model classes that represent
-  the data in the database.  Currently, there is only one model class, `User`,
-  which represents a user from the database `users` table.
+  the data in the database.  *You will not need to create any new model classes.*
 - `src/main/java/org.example/daos` - Contains the data access objects that
   interact with the database.  Currently, there is only one DAO class, `UserDao`,
   which interacts with the `users` table.
@@ -62,7 +61,6 @@ directory.  You will need to set the following properties:
 
 - `spring.datasource.username` - The username for your mysql server.
 - `spring.datasource.password` - The password for your mysql server.
-
 
 ### Running the Application
 
@@ -109,21 +107,16 @@ until you implement the REST endpoints.
 ## Exercise
 
 Your task is to implement the REST endpoints that allow users to interact with
-the store.  You will need to create a new model class, DAO class, and controller
+the store.  You will need to create a DAO class and a controller
 class for each of the tables in the database.
 
 Stop the application and follow the steps below to complete the exercise.
 
-### Step 1: Create the Model Classes
+### Step 1: Review the Model Classes
 
-In the `models` folder, create a new model class for each of the tables in the
-database (other than the `users` and `roles` tables).  Each model class should
-contain a field for each column in the table, and should contain getters and
-setters for each field. You should also create a constructor that takes all of
-the fields as arguments.
-
-You can refer to the existing `User` model class for an example of what these
-classes should look like.
+In the `models` folder, notice that there is a class for each of the tables in
+the database.  You will need to use these classes to interact with the database
+in the DAO classes and controller classes.
 
 ### Step 2: Create the DAO Classes
 
@@ -166,18 +159,24 @@ public class ProductDao {
 }
 ```
 
+Each DAO class will also need a mapping method that maps a `ResultSet` object
+to a model object so that your `SELECT` queries can map the results to the 
+appropriate model objects. You can refer to the `UserDao` class for an example
+of what this method should look like.
+
 ### Step 3: Create the Controller Classes
 
 Create a new controller class for each of the tables in the database (other
 than the `users` and `roles` tables).  Each controller class should contain
 methods providing REST endpoints for creating, reading, updating, and deleting
-items in the table.
+items in the table.  These endpoints are detailed below.
 
 You can refer to the existing `UserController` and `ProfileController` classes
 for an example of what these classes should look like.
 
 Note that each controller class injects its corresponding DAO class through
-the constructor.  You should do the same in your controller classes.
+an `@Autowired` class member.  You will need to do the same for your controller
+classes.
 
 For example:
 
@@ -185,33 +184,68 @@ For example:
 @RestController
 @RequestMapping("/products")
 public class ProductController {
+    @Autowired
     private ProductDao productDao;
-
-    public ProductController(ProductDao productDao) {
-        this.productDao = productDao;
-    }
 
     // ...
 }
 ```
+> [!Note]
+> Your "Get by Id" methods should return a 404 status code if the item is not
+> found in the database.  You can do this by throwing a `ResponseStatusException`
+> with a `HttpStatus.NOT_FOUND` status code. (Refer to the `UserController` class
+> for an example of how to do this.)
 
 When you are finished, you should have implemented all of the REST endpoints
 in the Postman collection, and they should all function properly and return
 appropriate data.
 
-## Testing / Verification
+### Product Endpoints
+
+- `GET /products` - Retrieves all products.
+- `GET /products/{id}` - Retrieves a product by the id in the path, return a 404 NOT FOUND status code if the product is not found.
+- `POST /products` - Creates a new product from the request body and returns the created product with a 201 CREATED http status code.
+- `PUT /products/{id}` - Updates an existing product from the request body and returns the updated product, return a 404 NOT FOUND status code if the product is not found.
+- `DELETE /products/{id}` - Deletes a product by the id in the path and returns the number of rows affected, return a 404 NOT FOUND status code if the product is not found.
+
+### Order Endpoints
+
+- `GET /orders` - Retrieves all orders.
+- `GET /orders/{id}` - Retrieves an order by the id in the path, return a 404 NOT FOUND status code if the order is not found.
+- `POST /orders` - Creates a new order from the request body and returns the created order with a 201 CREATED http status code.
+- `PUT /orders/{id}` - Updates an existing order from the request body and returns the updated order, return a 404 NOT FOUND status code if the order is not found.
+- `DELETE /orders/{id}` - Deletes an order by the id in the path and returns the number of rows affected, return a 404 NOT FOUND status code if the order is not found.
+
+### Order Item Endpoints
+
+- `GET /order-items` - Retrieves all order items.
+- `GET /order-items/{id}` - Retrieves an order item by the id in the path, return a 404 NOT FOUND status code if the order item is not found.
+- `POST /order-items` - Creates a new order item from the request body and returns the created order item with a CREATED http 201 status code.
+- `PUT /order-items/{id}` - Updates an existing order item from the request body and returns the updated order item, return a 404 NOT FOUND status code if the order item is not found.
+- `DELETE /order-items/{id}` - Deletes an order item by the id in the path and returns the number of rows affected, return a 404 NOT FOUND status code if the order item is not found.
+
+## Testing with Postman 
 
 You can verify that the application is working correctly by running the
 application and then launching Postman to test the REST endpoints.  You should
 be able to create, read, update, and delete items in the database using the
 REST endpoints that you created.
 
+## Testing with Included Unit Tests
+
+You can also verify that the application is working correctly by running the
+included unit tests.  The unit tests are located in the `src/test/java` directory.
+To run the unit tests, right-click on the `src/test/java` directory and select
+"Run All Tests".
+
+> [!warning]
+> DO NOT modify the unit tests.  Your project will be evaluated based on the
+> unit tests all passing.  Modifying the unit tests will result in a failing
+> grade.
+
 ## Evaluation
 
-Your project will be evaluated by the test proctor cloning your repository,
-running the database script, running the application, and executing the
-Postman requests.  You will receive full credit if all of the requests execute
-successfully and return the expected data.
+Your project will be evaluated based on the unit tests all passing.
 
 ## Bonus Steps
 
@@ -222,13 +256,13 @@ controller classes to require that users be authenticated in order to access
 the endpoints.  You can use the `isAuthenticated()` expression to require that
 users be authenticated.
 
-### Bonus Step 2: Constrain Product Creation and Update using `Principal`
+### Bonus Step 2: Constrain Order Creation and Update using `Principal`
 
 Add a `Principal` argument to the create and update endpoints for the
-`Product` controller that will allow you to get the username of the user and
-overwrite the `username` field in the passed `Product` object.  This will
+`Order` controller that will allow you to get the username of the user and
+overwrite the `username` field in the passed `Order` object.  This will
 guaranatee that the `username` field is always set to the username of the
-user that created or updated the product.
+user that created or updated the order.
 
 For example:
 
@@ -262,7 +296,6 @@ public List<Order> listOrders(@RequestParam(required = false) String username) {
 > [!Note]
 > You will need to create a new method in the `OrderDao` class that retrieves
 > orders by username.
-
 
 ### Bonus Step 4: Add optional query parameters to the `OrderItems` GET endpoint
 

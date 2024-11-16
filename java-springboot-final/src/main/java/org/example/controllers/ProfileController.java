@@ -2,6 +2,7 @@ package org.example.controllers;
 
 import org.example.daos.UserDao;
 import org.example.models.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,16 +19,8 @@ public class ProfileController {
     /**
      * The user data access object.
      */
-    private final UserDao userDao;
-
-    /**
-     * Creates a new user controller.
-     *
-     * @param userDao The user data access object.
-     */
-    public ProfileController(UserDao userDao) {
-        this.userDao = userDao;
-    }
+    @Autowired
+    private UserDao userDao;
 
     /**
      * Gets the profile of the currently logged in user.
@@ -60,7 +53,7 @@ public class ProfileController {
      * @param newPassword The new password.
      * @return The updated user.
      */
-    @PostMapping("/change-password")
+    @PutMapping("/change-password")
     public User changePassword(Principal principal, @RequestBody String newPassword) {
         String username = principal.getName();
         User user = userDao.getUserByUsername(username);

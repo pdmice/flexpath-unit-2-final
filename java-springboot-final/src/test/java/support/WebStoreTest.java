@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Objects;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Base class for web store tests.
  */
@@ -42,12 +44,6 @@ public class WebStoreTest {
      */
     @Autowired
     protected DataSource dataSource;
-
-    /**
-     * An injected JDBC template for use in tests.
-     */
-    @Autowired
-    protected JdbcTemplate jdbcTemplate;
 
     /**
      * An injected password encoder for use in tests.
@@ -77,6 +73,15 @@ public class WebStoreTest {
     }
 
     /**
+     * Gets a JDBC template for the data source.
+     *
+     * @return The JDBC template.
+     */
+    protected JdbcTemplate getJdbcTemplate() {
+        return new JdbcTemplate(dataSource);
+    }
+
+    /**
      * Sets up the test environment.
      *
      * @throws SQLException If an error occurs while setting up the database.
@@ -94,6 +99,7 @@ public class WebStoreTest {
         sr.setLogWriter(null);
         sr.setErrorLogWriter(null);
         sr.runScript(reader);
+        connection.close();
     }
 
     /**
@@ -118,6 +124,7 @@ public class WebStoreTest {
         var token = Objects.requireNonNull(loginResult.getBody()).getAccessToken().getToken();
         var headers = new HttpHeaders();
         headers.setBearerAuth(token);
+        headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
         return new HttpEntity<>(headers);
     }
 
@@ -138,12 +145,12 @@ public class WebStoreTest {
             user,
             LoginResponse.class
         );
-        if (loginResult.getStatusCode() != HttpStatus.OK) {
-            throw new RuntimeException("Failed to login");
-        }
+
+        assertEquals(HttpStatus.OK, loginResult.getStatusCode());
         var token = Objects.requireNonNull(loginResult.getBody()).getAccessToken().getToken();
         var headers = new HttpHeaders();
         headers.setBearerAuth(token);
+        headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
         return new HttpEntity<>(body, headers);
     }
 }

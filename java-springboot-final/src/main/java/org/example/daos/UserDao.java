@@ -100,9 +100,9 @@ public class UserDao {
      *
      * @param username The username of the user.
      */
-    public void deleteUser(String username) {
+    public int deleteUser(String username) {
         String sql = "DELETE FROM users WHERE username = ? ";
-        jdbcTemplate.update(sql, username);
+        return jdbcTemplate.update(sql, username);
     }
 
     /**
@@ -137,9 +137,9 @@ public class UserDao {
      * @param username The username of the user.
      * @param role The role to delete.
      */
-    public void deleteRole(String username, String role) {
+    public int deleteRole(String username, String role) {
         String sql = "DELETE FROM roles WHERE username = ? AND role = ?";
-        jdbcTemplate.update(sql, username, role);
+        return jdbcTemplate.update(sql, username, role);
     }
 
     /**

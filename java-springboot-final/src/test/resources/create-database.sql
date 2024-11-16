@@ -33,7 +33,7 @@ create table order_items (
     foreign key (product_id) references products(id) on delete cascade
 );
 
-insert into users (username, password) values ('test-admin', '$2a$10$yNhRmtAD2o/E/5CH83yGsO2aoC3ww1JUE76xUrIYLbfNcTV5G2WrO');
+insert into users (username, password) values ('test-admin', 'admin');
 insert into roles (username, role) values ('test-admin', 'ADMIN');
 
 insert into products (name, price) values ('Apple', 0.99);
@@ -47,3 +47,10 @@ insert into orders (username) values ('test-admin');
 insert into orders (username) values ('test-admin');
 insert into orders (username) values ('test-admin');
 insert into orders (username) values ('test-admin');
+
+insert into order_items (order_id, product_id, quantity) values (1, 1, 1);
+insert into order_items (order_id, product_id, quantity) values (2, 2, 2);
+insert into order_items (order_id, product_id, quantity) values (3, 3, 3);
+insert into order_items (order_id, product_id, quantity) values (4, 4, 4);
+insert into order_items (order_id, product_id, quantity) values (5, 5, 5);
+

@@ -2,9 +2,11 @@ package org.example.controllers;
 
 import org.example.models.User;
 import org.example.daos.UserDao;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -20,16 +22,8 @@ public class UserController {
     /**
      * The user data access object.
      */
-    private final UserDao userDao;
-
-    /**
-     * Creates a new user controller.
-     *
-     * @param userDao The user data access object.
-     */
-    public UserController(UserDao userDao) {
-        this.userDao = userDao;
-    }
+    @Autowired
+    private UserDao userDao;
 
     /**
      * Gets all users.
@@ -75,6 +69,9 @@ public class UserController {
     @PutMapping(path = "/{username}/password")
     public User updatePassword(@RequestBody String password, @PathVariable String username) {
         User user = userDao.getUserByUsername(username);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+        }
         user.setPassword(password);
         return userDao.updatePassword(user);
     }
@@ -84,10 +81,9 @@ public class UserController {
      *
      * @param username The username of the user to delete.
      */
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path = "/{username}")
-    public void delete(@PathVariable String username) {
-        userDao.deleteUser(username);
+    public int delete(@PathVariable String username) {
+        return userDao.deleteUser(username);
     }
 
     /**
@@ -118,9 +114,13 @@ public class UserController {
      * @param username The username of the user.
      * @param role The role to delete.
      */
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path = "/{username}/roles/{role}")
-    public void deleteRole(@PathVariable String username, @PathVariable String role) {
-        userDao.deleteRole(username, role.toUpperCase());
+    public int deleteRole(@PathVariable String username, @PathVariable String role) {
+        var affectedRows = userDao.deleteRole(username, role.toUpperCase());
+        if (affectedRows == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found");
+        } else {
+            return affectedRows;
+        }
     }
 }
