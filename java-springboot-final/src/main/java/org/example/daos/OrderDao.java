@@ -50,7 +50,7 @@ public class OrderDao {
     }
 
     public Order updateOrder(Order order){
-        String sql = "UPDATE orders SET username ? WHERE id = ?;";
+        String sql = "UPDATE orders SET username = ? WHERE id = ?;";
 
         int rowsAffected = jdbcTemplate.update(sql, order.getUsername(), order.getId());
 

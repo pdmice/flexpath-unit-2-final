@@ -1,5 +1,6 @@
 package org.example.controllers;
 
+import org.apache.ibatis.annotations.Delete;
 import org.example.daos.OrderDao;
 import org.example.models.Order;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,7 @@ import java.util.List;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/orders")
-//@PreAuthorize("hasAuthority('ADMIN')")
+@PreAuthorize("hasAuthority('ADMIN')")
 
 
 public class OrderController {
@@ -37,12 +38,12 @@ public class OrderController {
         return orderDao.createOrder(order);
     }
 
-    @PutMapping("/id")
-    public Order updateOrder(@RequestBody Order order){
+    @PutMapping(path = "/{id}")
+    public Order updateOrder(@RequestBody Order order,  @PathVariable int id){
         return orderDao.updateOrder(order);
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping(path = "/{id}")
     public int deleteOrder(@PathVariable int id){
         return orderDao.deleteOrder(id);
     }
