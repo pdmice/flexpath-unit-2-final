@@ -36,3 +36,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Secrets ###
+/home/rahvin/repos/launchcode/flexpath-unit-2-final/java-springboot-final/src/main/resources/application.properties

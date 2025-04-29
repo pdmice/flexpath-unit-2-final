@@ -3,7 +3,7 @@ package org.example.models;
 /**
  * Model for an order.
  */
-public class Order {
+public class    Order {
     /**
      * The ID of the order.
      */

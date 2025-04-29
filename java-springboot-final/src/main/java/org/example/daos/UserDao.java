@@ -28,7 +28,7 @@ public class UserDao {
      */
     private final PasswordEncoder passwordEncoder;
 
-    /**
+    /**jdbcTemplate
      * Creates a new user data access object.
      *
      * @param dataSource The data source for the DAO.
