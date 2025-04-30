@@ -28,7 +28,8 @@ public class UserController {
     /**
      * Gets all users.
      *
-     * @return A list of all users.
+     * @return A list of all users.//@PreAuthorize("hasAuthority('ADMIN')")
+
      */
     @GetMapping
     public List<User> getAll() {
