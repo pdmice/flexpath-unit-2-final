@@ -36,12 +36,12 @@ public class OrderItemController {
         return orderItemDao.createOI(orderItem);
     }
 
-    @PutMapping("/id")
+    @PutMapping(path = "/{id}")
     public OrderItem updateOrderItem(@RequestBody OrderItem orderItem, @PathVariable int id){
         return orderItemDao.updateOI(orderItem, id);
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public int deleteOrderItem(@PathVariable int id){
         return orderItemDao.deleteOI(id);
     }
